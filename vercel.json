@@ -1,0 +1,27 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "framework": "nextjs",
+  "regions": ["iad1"],
+  "env": {
+    "NEXT_PUBLIC_SUPABASE_URL": {
+      "description": "Your Supabase project URL",
+      "required": true
+    },
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": {
+      "description": "Your Supabase anonymous key",
+      "required": true
+    },
+    "GROQ_API_KEY": {
+      "description": "Your Groq API key for OCR functionality",
+      "required": true
+    }
+  },
+  "build": {
+    "env": {
+      "NEXT_PUBLIC_SUPABASE_URL": "@supabase-url",
+      "NEXT_PUBLIC_SUPABASE_ANON_KEY": "@supabase-anon-key",
+      "GROQ_API_KEY": "@groq-api-key"
+    }
+  }
+}

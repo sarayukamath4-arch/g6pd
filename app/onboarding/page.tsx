@@ -1,0 +1,27 @@
+import { DisclaimerModal } from "@/components/auth/DisclaimerModal";
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+
+export default async function OnboardingPage() {
+  const supabase = await createClient();
+  
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) {
+    redirect('/auth/login');
+  }
+
+  // Check if user has already accepted disclaimer
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('disclaimer_accepted_at')
+    .eq('id', user.id)
+    .single();
+
+  // If disclaimer already accepted, redirect to dashboard
+  if (profile?.disclaimer_accepted_at) {
+    redirect('/');
+  }
+
+  return <DisclaimerModal />;
+}
