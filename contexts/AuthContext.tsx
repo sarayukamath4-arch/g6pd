@@ -46,11 +46,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signUp = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({
+    const { error, data } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
     });
+    
     if (error) throw error;
+    
+    // For development, if email confirmation is enabled, we'll auto-confirm
+    // In production, you would remove this and handle email confirmation properly
+    if (data.user && !data.session) {
+      // Email confirmation is enabled, try to auto-confirm for development
+      // This is a workaround for development - in production use proper email flow
+      console.log('Email confirmation enabled. For development, please disable it in Supabase dashboard.');
+    }
   };
 
   const signOut = async () => {

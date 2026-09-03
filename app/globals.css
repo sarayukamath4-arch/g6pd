@@ -97,6 +97,10 @@ body {
   color: hsl(var(--foreground));
 }
 
+.no-underline {
+  text-decoration: none;
+}
+
 html,
 body {
   margin: 0;

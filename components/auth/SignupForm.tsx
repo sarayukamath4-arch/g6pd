@@ -15,6 +15,7 @@ export function SignupForm() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
   const [disclaimerAccepted, setDisclaimerAccepted] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -36,7 +37,8 @@ export function SignupForm() {
 
     try {
       await signUp(email, password);
-      // User will need to go through onboarding after email confirmation
+      setSuccess(true);
+      // User will be redirected automatically by auth state change
     } catch (err: any) {
       setError(err.message || "Failed to sign up");
     } finally {
@@ -117,6 +119,11 @@ export function SignupForm() {
           {error && (
             <div className="text-sm text-red-600 bg-red-50 p-3 rounded">
               {error}
+            </div>
+          )}
+          {success && (
+            <div className="text-sm text-emerald-600 bg-emerald-50 p-3 rounded">
+              Account created successfully! Redirecting to onboarding...
             </div>
           )}
           <Button type="submit" className="w-full" disabled={loading}>
