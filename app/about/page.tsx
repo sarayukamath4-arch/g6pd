@@ -23,7 +23,7 @@ export default function Home() {
 
           <div className="mt-8 flex gap-4">
             <Link
-              href="/g6pd"
+              href="/learn"
               className="rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700"
             >
               Explore G6PD

@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GeneGuide (G6PD Deficiency Reference & Reaction Journal)
 
-## Getting Started
+A privacy-first web app for people with G6PD deficiency to learn about the condition, search substances against clinically reviewed evidence, scan product labels for ingredients, and log personal reactions to surface observational patterns.
 
-First, run the development server:
+See `app/learn/docs/PRD.md` and `app/learn/docs/UIUX_Spec.md` for the full product spec.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Stack
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- Next.js 16 (App Router, React 19, TypeScript)
+- Tailwind CSS + shadcn/ui
+- Supabase (Postgres + Auth + Row-Level Security)
+- Groq API (vision model for label OCR)
+- `@react-pdf/renderer` for the doctor report export
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Local setup
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+2. Create a Supabase project, then run the migrations in `supabase/migrations/` **in order** (001 → 006) against it — either via the Supabase SQL editor or the Supabase CLI (`supabase db push`).
+3. Copy `.env.local.example` to `.env.local` and fill in the values (see below).
+4. Run the dev server:
+   ```bash
+   npm run dev
+   ```
 
-## Learn More
+## Environment variables
 
-To learn more about Next.js, take a look at the following resources:
+| Variable | Where to find it |
+| --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project → Settings → API |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase project → Settings → API |
+| `GROQ_API_KEY` | [console.groq.com](https://console.groq.com) → API Keys |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+These are also declared in `vercel.json` so Vercel prompts for them on import.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Deploying to Vercel
 
-## Deploy on Vercel
+1. Push this repo to GitHub/GitLab/Bitbucket and import it in Vercel (framework preset: Next.js — auto-detected).
+2. Add the three environment variables above in the Vercel project settings (Production, Preview, and Development as needed).
+3. In Supabase, add your Vercel deployment URL (and any preview URLs you use) to **Authentication → URL Configuration → Redirect URLs**, e.g. `https://your-app.vercel.app/auth/callback`.
+4. If you enable Google OAuth, configure it under Supabase **Authentication → Providers → Google** and add the same redirect URL there.
+5. Deploy. `vercel.json` already points to `npm run build`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Known gaps / not yet implemented
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Label photo storage**: `journal_entries.label_image_url` exists in the schema, but scanned images are never uploaded to Supabase Storage — only the extracted text/ingredients are saved. Wiring this up would mean creating a storage bucket + RLS policies and uploading the compressed image from `app/scanner/page.tsx` after a successful scan.
+- **PIN lock** (Profile → Security) is intentionally disabled with a "coming in a future update" notice.
+- **Offline queueing** (IndexedDB) described in the UI/UX spec for journal submissions is not implemented; the app currently requires connectivity to save entries.
+- Deleting an account removes the user's `profiles`/`journal_entries`/`user_learning_progress` rows but cannot delete the underlying `auth.users` record from the client (that requires a service-role key on a server route) — the account remains in Supabase Auth after "deletion."

@@ -22,10 +22,10 @@ export function LoginForm() {
 
     try {
       await signIn(email, password);
-      // Redirect will be handled by middleware or useEffect
+      // Full navigation so the disclaimer/onboarding gate is re-evaluated server-side
+      window.location.href = "/onboarding";
     } catch (err: any) {
       setError(err.message || "Failed to sign in");
-    } finally {
       setLoading(false);
     }
   };

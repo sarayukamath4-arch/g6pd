@@ -16,6 +16,7 @@ export function SignupForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [needsConfirmation, setNeedsConfirmation] = useState(false);
   const [disclaimerAccepted, setDisclaimerAccepted] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -36,12 +37,17 @@ export function SignupForm() {
     }
 
     try {
-      await signUp(email, password);
+      const hasSession = await signUp(email, password);
       setSuccess(true);
-      // User will be redirected automatically by auth state change
+      if (hasSession) {
+        // Session created immediately (email confirmation disabled) - continue to onboarding
+        window.location.href = "/onboarding";
+      } else {
+        setNeedsConfirmation(true);
+        setLoading(false);
+      }
     } catch (err: any) {
       setError(err.message || "Failed to sign up");
-    } finally {
       setLoading(false);
     }
   };
@@ -123,7 +129,9 @@ export function SignupForm() {
           )}
           {success && (
             <div className="text-sm text-emerald-600 bg-emerald-50 p-3 rounded">
-              Account created successfully! Redirecting to onboarding...
+              {needsConfirmation
+                ? "Account created! Check your email to confirm your account before signing in."
+                : "Account created successfully! Redirecting to onboarding..."}
             </div>
           )}
           <Button type="submit" className="w-full" disabled={loading}>

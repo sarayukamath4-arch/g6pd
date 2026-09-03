@@ -1,10 +1,6 @@
 import { NextResponse } from 'next/server';
 import Groq from 'groq-sdk';
 
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
-});
-
 // GET /api/groq -> Lists all active models available on your specific API key
 export async function GET() {
   try {
@@ -14,6 +10,10 @@ export async function GET() {
         { status: 500 }
       );
     }
+
+    const groq = new Groq({
+      apiKey: process.env.GROQ_API_KEY,
+    });
 
     const modelList = await groq.models.list();
     const availableModels = modelList.data.map((m) => m.id);
@@ -45,6 +45,10 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
+
+    const groq = new Groq({
+      apiKey: process.env.GROQ_API_KEY,
+    });
 
     const completion = await groq.chat.completions.create({
       model: 'openai/gpt-oss-20b',

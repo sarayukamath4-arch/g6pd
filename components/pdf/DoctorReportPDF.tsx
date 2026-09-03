@@ -107,7 +107,6 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   ingredientTag: {
-    display: 'inline-block',
     backgroundColor: '#e5e7eb',
     paddingHorizontal: 6,
     paddingVertical: 3,
