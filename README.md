@@ -33,12 +33,10 @@ See `app/learn/docs/PRD.md` and `app/learn/docs/UIUX_Spec.md` for the full produ
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase project → Settings → API |
 | `GROQ_API_KEY` | [console.groq.com](https://console.groq.com) → API Keys |
 
-These are also declared in `vercel.json` so Vercel prompts for them on import.
-
 ## Deploying to Vercel
 
 1. Push this repo to GitHub/GitLab/Bitbucket and import it in Vercel (framework preset: Next.js — auto-detected).
-2. Add the three environment variables above in the Vercel project settings (Production, Preview, and Development as needed).
+2. Set the three environment variables above in the Vercel project (Production, Preview, and Development as needed) — either manually in Project Settings → Environment Variables, or via the Supabase Vercel integration (which injects `NEXT_PUBLIC_SUPABASE_URL`/`NEXT_PUBLIC_SUPABASE_ANON_KEY` automatically once connected). Either way, `GROQ_API_KEY` still needs to be added manually since it has no integration.
 3. In Supabase, add your Vercel deployment URL (and any preview URLs you use) to **Authentication → URL Configuration → Redirect URLs**, e.g. `https://your-app.vercel.app/auth/callback`.
 4. If you enable Google OAuth, configure it under Supabase **Authentication → Providers → Google** and add the same redirect URL there.
 5. Deploy. `vercel.json` already points to `npm run build`.
