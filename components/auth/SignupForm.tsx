@@ -9,11 +9,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import Link from "next/link";
 
 export function SignupForm() {
-  const { signUp } = useAuth();
+  const { signUp, signInWithGoogle } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [needsConfirmation, setNeedsConfirmation] = useState(false);
@@ -49,6 +50,18 @@ export function SignupForm() {
     } catch (err: any) {
       setError(err.message || "Failed to sign up");
       setLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setGoogleLoading(true);
+    setError("");
+    try {
+      await signInWithGoogle();
+      // Browser will redirect to Google, then back to /auth/callback
+    } catch (err: any) {
+      setError(err.message || "Failed to sign up with Google");
+      setGoogleLoading(false);
     }
   };
 
@@ -134,10 +147,30 @@ export function SignupForm() {
                 : "Account created successfully! Redirecting to onboarding..."}
             </div>
           )}
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button type="submit" className="w-full" disabled={loading || googleLoading}>
             {loading ? "Creating account..." : "Create Account"}
           </Button>
         </form>
+
+        <div className="relative my-4">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t border-slate-200" />
+          </div>
+          <div className="relative flex justify-center text-xs">
+            <span className="bg-white px-2 text-slate-500">or</span>
+          </div>
+        </div>
+
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full"
+          onClick={handleGoogleSignIn}
+          disabled={loading || googleLoading}
+        >
+          {googleLoading ? "Redirecting..." : "Continue with Google"}
+        </Button>
+
         <div className="mt-4 text-center text-sm">
           Already have an account?{" "}
           <Link href="/auth/login" className="text-emerald-600 hover:underline">
