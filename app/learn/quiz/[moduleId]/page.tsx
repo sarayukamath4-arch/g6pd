@@ -233,7 +233,7 @@ export default function QuizPage() {
             completed: true,
             quiz_score: percentage,
             updated_at: new Date().toISOString()
-          });
+          }, { onConflict: 'user_id,module_id' });
       } catch (error) {
         console.error('Error saving quiz progress:', error);
       }

@@ -16,7 +16,7 @@ interface VerificationModalProps {
     product_name: string;
     ingredients: string[];
   };
-  onConfirm: (data: { productName: string; ingredients: string[] }) => void;
+  onConfirm: (data: { productName: string; ingredients: string[]; exposureDate: string }) => void;
 }
 
 export function VerificationModal({ isOpen, onClose, productData, onConfirm }: VerificationModalProps) {
@@ -43,6 +43,18 @@ export function VerificationModal({ isOpen, onClose, productData, onConfirm }: V
     }
   };
 
+  // Re-sync form state with the latest scan whenever the modal opens.
+  // The modal stays mounted between scans, so without this a second scan
+  // (after cancelling the first) would keep showing the previous scan's data.
+  useEffect(() => {
+    if (isOpen) {
+      setProductName(productData.product_name);
+      setIngredients(productData.ingredients);
+      setExposureDate(new Date().toISOString().split('T')[0]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, productData]);
+
   // Check triggers when modal opens or ingredients change
   useEffect(() => {
     if (isOpen && ingredients.length > 0) {
@@ -65,7 +77,8 @@ export function VerificationModal({ isOpen, onClose, productData, onConfirm }: V
   const handleConfirm = () => {
     onConfirm({
       productName,
-      ingredients
+      ingredients,
+      exposureDate
     });
     onClose();
   };

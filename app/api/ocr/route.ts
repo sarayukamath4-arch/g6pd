@@ -1,10 +1,6 @@
 import { NextResponse } from 'next/server';
 import Groq from 'groq-sdk';
 
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
-});
-
 // Create a timeout promise
 const timeout = (ms: number) => new Promise((_, reject) => 
   setTimeout(() => reject(new Error('Request timeout')), ms)
@@ -18,6 +14,10 @@ export async function POST(req: Request) {
         { status: 500 }
       );
     }
+
+    const groq = new Groq({
+      apiKey: process.env.GROQ_API_KEY,
+    });
 
     const formData = await req.formData();
     const image = formData.get('image') as File;
@@ -75,7 +75,7 @@ Rules:
             ],
           },
         ],
-        model: 'llama-3.2-11b-vision-preview',
+        model: 'qwen/qwen3.6-27b',
         temperature: 0.1,
         max_tokens: 1024,
       }),

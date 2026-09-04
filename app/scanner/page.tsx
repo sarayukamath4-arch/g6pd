@@ -111,12 +111,12 @@ export default function Scanner() {
     }
   };
 
-  const handleVerificationConfirm = (data: { productName: string; ingredients: string[] }) => {
+  const handleVerificationConfirm = (data: { productName: string; ingredients: string[]; exposureDate: string }) => {
     // Store data for journal entry
     sessionStorage.setItem('pending-scan-data', JSON.stringify({
       productName: data.productName,
       ingredients: data.ingredients,
-      exposureDate: new Date().toISOString().split('T')[0]
+      exposureDate: data.exposureDate
     }));
     
     // Redirect to journal

@@ -8,7 +8,8 @@ type AuthContextType = {
   user: User | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string) => Promise<boolean>;
+  signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
 };
 
@@ -55,14 +56,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
     
     if (error) throw error;
-    
-    // For development, if email confirmation is enabled, we'll auto-confirm
-    // In production, you would remove this and handle email confirmation properly
-    if (data.user && !data.session) {
-      // Email confirmation is enabled, try to auto-confirm for development
-      // This is a workaround for development - in production use proper email flow
-      console.log('Email confirmation enabled. For development, please disable it in Supabase dashboard.');
-    }
+
+    // Returns whether a session was created immediately (email confirmation
+    // disabled) vs. the user needing to confirm via email first.
+    return !!data.session;
+  };
+
+  const signInWithGoogle = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+    if (error) throw error;
   };
 
   const signOut = async () => {
@@ -71,7 +78,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ user, loading, signIn, signUp, signInWithGoogle, signOut }}>
       {children}
     </AuthContext.Provider>
   );
